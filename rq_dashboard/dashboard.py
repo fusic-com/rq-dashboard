@@ -66,6 +66,20 @@ def jsonify(f):
     return _wrapped
 
 
+def handled(f):
+    """decorator used to send a request to a user defined handler
+    """
+    @wraps(f)
+    def _wrapped(*args, **kwargs):
+        try:
+            handler = current_app.config.get('RQ_DASHBOARD_HANDLER', False)
+            handler(f.__name__, *args, **kwargs)
+            return dict(status='OK')
+        except:
+            return f(*args, **kwargs)
+    return _wrapped
+
+
 def serialize_queues(queues):
     return [dict(name=q.name, count=q.count, url=url_for('.overview',
         queue_name=q.name)) for q in queues]
@@ -203,6 +217,7 @@ def empty_queue(queue_name):
 
 @dashboard.route('/queue/<queue_name>/requeue-all', methods=['POST'])
 @jsonify
+@handled
 def requeue_queue(queue_name):
     if queue_name == "timeout":
         fq = RqTimeoutQueue()
@@ -220,6 +235,7 @@ def requeue_queue(queue_name):
 
 @dashboard.route("/queue/<queue_name>/cancel-all", methods=["POST"])
 @jsonify
+@handled
 def cancel_all(queue_name):
   queue = Queue(queue_name)
   count = 0
@@ -233,6 +249,7 @@ def cancel_all(queue_name):
 
 @dashboard.route('/queue/<queue_name>/compact', methods=['POST'])
 @jsonify
+@handled
 def compact_queue(queue_name):
     q = Queue(queue_name)
     q.compact()

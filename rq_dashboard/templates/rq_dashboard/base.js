@@ -57,6 +57,27 @@ var api = {
     }
 };
 
+window.asyncLoadLogs = function(){
+    jobsIds = [];
+    $(".job-logs.loading").each(function(){
+        jobsIds.push($(this).closest("[data-role=job]").data("job-id"));
+    });
+    $.ajax({
+        "url": "/logs.json",
+        "type": "POST",
+        "contentType": 'application/json',
+        "dataType": "json",
+        "data": JSON.stringify({"jobsids": jobsIds}),
+        "success":function(results) {
+            if (!results.success) return console.log("error on fetching job logs : " + results.error);
+            $.each(results.logs, function(i, item){
+                $("[data-job-id='" + item.jobid + "'] .job-logs.loading").removeClass("loading").html(item.logs.join("\n"));
+            });
+            $(".job-logs.loading").removeClass("loading").html("&oslash;");
+        }
+    });
+};
+
 
 $(document).ready(function(){
   // Enable the AJAX behaviour of the cancel job button
@@ -92,4 +113,18 @@ $(document).ready(function(){
 
         return false;
     });
+
+
+    $("#enable-polling").change(function(firstLoad){
+        if ($(this).is(":checked")) {
+            window.pollInterval = setInterval(window.refresh_all_tables, POLL_INTERVAL);
+            if (!firstLoad) window.refresh_all_tables();
+        } else if (window.pollInterval !== undefined) {
+            clearInterval(window.pollInterval);
+            delete(window.pollInterval);
+        }
+    });
+    $("#enable-polling").change(true);
+    // $('#refresh-button').click(window.refresh_all_tables);
+    window.refresh_all_tables();
 });

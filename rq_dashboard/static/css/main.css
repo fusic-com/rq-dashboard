@@ -114,3 +114,21 @@ span.loading {
     font-size: .8em;
     color: #555;
 }
+
+.job-logs.loading{
+    background-image: url("../img/ajax-loader.gif");
+    background-repeat: no-repeat;
+    background-position: center center;
+}
+
+.enable-polling-wrapper{
+    position: fixed;
+    background-color: #aaa;
+    padding: 5px 10px;
+    right: 50px;
+    top: 10px;
+}
+.enable-polling-wrapper label{
+    display: inline;
+    cursor: pointer;
+}

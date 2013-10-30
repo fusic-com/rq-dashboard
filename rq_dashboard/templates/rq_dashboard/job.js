@@ -1,5 +1,5 @@
 (function($) {
-    var reload_table = function(done) {
+    window.refresh_all_tables = function(done) {
         var $raw_tpl = $('script[name=job-row]').html();
         var template = _.template($raw_tpl);
 
@@ -37,19 +37,8 @@
             if (done !== undefined) {
                 done();
             }
+            window.asyncLoadLogs();
         });
     };
-
-    var refresh_table = function() {
-        $('span.loading').fadeIn('fast');
-        reload_table(function() {
-            $('span.loading').fadeOut('fast');
-        });
-    };
-
-    $(document).ready(function() {
-        reload_table();
-        setInterval(refresh_table, POLL_INTERVAL);
-    });
 
 })($);

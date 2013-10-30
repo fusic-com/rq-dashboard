@@ -1,10 +1,8 @@
-
-
-//
-// QUEUES
-//
 (function($) {
-    var reload_table = function(done) {
+    //
+    // QUEUES
+    //
+    var refresh_queues_table = function(done) {
         var $raw_queue_tpl = $('script[name=queue-row]').html();
         var $raw_job_name_tpl = $('script[name=job-name-row]').html();
         var queue_template = _.template($raw_queue_tpl);
@@ -60,40 +58,10 @@
         });
     };
 
-    var refresh_table = function() {
-        $('span.loading').fadeIn('fast');
-        reload_table(function() {
-            $('span.loading').fadeOut('fast');
-        });
-    };
-
-    $(document).ready(function() {
-
-        $('#empty-all-btn').click(function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            var $this = $(this);
-            $.post($this.attr('href'), function(data) {
-                reload_table();
-            });
-
-            return false;
-        });
-
-        reload_table();
-        $('#refresh-button').click(refresh_table);
-        setInterval(refresh_table, POLL_INTERVAL);
-
-    });
-})($);
-
-
-//
-// WORKERS
-//
-(function($) {
-    var reload_table = function(done) {
+    //
+    // WORKERS
+    //
+    var refresh_workers_table = function(done) {
         var $tbody = $('table#workers tbody');
 
         $('tr[data-role=loading-placeholder]', $tbody).show();
@@ -168,28 +136,10 @@
         });
     };
 
-    var refresh_table = function() {
-        $('span.loading').fadeIn('fast');
-        reload_table(function() {
-            $('span.loading').fadeOut('fast');
-        });
-    };
-
-    $(document).ready(function() {
-
-        reload_table();
-        $('#refresh-button').click(refresh_table);
-        setInterval(refresh_table, POLL_INTERVAL);
-
-    });
-})($);
-
-
-//
-// JOBS
-//
-(function($) {
-    var reload_table = function(done) {
+    //
+    // JOBS
+    //
+    var refresh_jobs_table = function(done) {
         var $raw_tpl = $('script[name=job-row]').html();
         var template = _.template($raw_tpl);
 
@@ -259,52 +209,58 @@
                $ul.append($el);
            });
 
-           // next page
-           if (pagination.next_page !== undefined ) {
-               var $raw_tpl_next_page = $('script[name=next-page-link]').html();
-               var template_next_page = _.template($raw_tpl_next_page);
-               var html = template_next_page(pagination.next_page);
-               var $el = $(html);
-               $ul.append($el);
-           } else {
-               var html = $('script[name=no-next-page-link]').html();
-               $ul.append(html);
-           }
+            // next page
+            if (pagination.next_page !== undefined ) {
+                var $raw_tpl_next_page = $('script[name=next-page-link]').html();
+                var template_next_page = _.template($raw_tpl_next_page);
+                var html = template_next_page(pagination.next_page);
+                var $el = $(html);
+                $ul.append($el);
+            } else {
+                var html = $('script[name=no-next-page-link]').html();
+                $ul.append(html);
+            }
 
             $("pre.exc_info").click(function(e){ $(this).closest("tr[data-role=job]").toggleClass("enlarge"); });
 
+            window.asyncLoadLogs();
         });
     };
 
-    var refresh_table = function() {
-        $('span.loading').fadeIn('fast');
-        reload_table(function() {
-          $('span.loading').fadeOut('fast');
-        });
-    };
 
     $(document).ready(function() {
 
-        reload_table();
-        $('#refresh-button').click(refresh_table);
-        setInterval(refresh_table, POLL_INTERVAL);
+        window.refresh_all_tables = function(){
+            refresh_queues_table();
+            refresh_workers_table();
+            refresh_jobs_table();
+        };
 
-        $("#toggle-json-jobs").click(function(){ $("table#jobs").toggleClass("enlarge"); });
-    });
-
-    // Enable the AJAX behaviour of the buttons
-    $('#empty-btn, #compact-btn, #requeue-all-btn, #cancel-all-btn').click(function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-
-        var $this = $(this);
-        $this.attr("disabled", "disabled");
-        $.post($this.attr('href'), function(data) {
-          reload_table();
-          $this.removeAttr("disabled");
+        $('#empty-all-btn').click(function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var $this = $(this);
+            $.post($this.attr('href'), function(data) {
+                refresh_all_tables();
+            });
+            return false;
         });
 
-        return false;
-    });
+        $("#toggle-json-jobs").click(function(){ $("table#jobs").toggleClass("enlarge"); });
 
+        // Enable the AJAX behaviour of the buttons
+        $('#empty-btn, #compact-btn, #requeue-all-btn, #cancel-all-btn').click(function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            var $this = $(this);
+            $this.attr("disabled", "disabled");
+            $.post($this.attr('href'), function(data) {
+              window.refresh_all_tables();
+              $this.removeAttr("disabled");
+            });
+
+            return false;
+        });
+    });
 })($);

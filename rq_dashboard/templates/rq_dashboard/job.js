@@ -7,6 +7,8 @@
 
         $('tr[data-role=loading-placeholder]', $tbody).show();
 
+        var logsCache = $(".job-logs").html() || "";
+
         // Fetch the available jobs on the queue
         api.getJob('{{ job_id }}', function(job) {
             $tbody.empty();
@@ -14,7 +16,8 @@
 
             if (job && jobs.length > 0) {
                 $.each(jobs, function(i, job) {
-                    job.expand=true;
+                    job.expand = true;
+                    job.logs = logsCache;
                     job.created_at = toRelative(Date.create(job.created_at));
 
                     if (job.ended_at) {

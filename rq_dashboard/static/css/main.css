@@ -79,10 +79,9 @@ table#jobs div.job_id {
 pre.exc_info {
     max-height: 30px;
     overflow: hidden;
-    cursor: pointer;
 }
 
-.enlarge pre.exc_info {
+.expand pre.exc_info {
   color: #fff;
   background-color: black;
   max-height: none;
@@ -118,7 +117,7 @@ span.loading {
 .job-logs.loading{
     background-image: url("../img/ajax-loader.gif");
     background-repeat: no-repeat;
-    background-position: center center;
+    background-position: top right;
 }
 
 .enable-polling-wrapper{

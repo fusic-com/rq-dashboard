@@ -152,9 +152,12 @@
         var $ul = $('div#page-selection ul');
 
         // get toggle mode for all the jobs
-        var toggleStates = {};
+        var jobsCache = {};
         $tbody.find("[data-role=job]").each(function(idx){
-          toggleStates[$(this).attr("data-job-id")] = $(this).hasClass("enlarge");
+            jobsCache[$(this).attr("data-job-id")] = {
+                "expand": $(this).hasClass("expand"),
+                "logs": $(this).find(".job-logs").html()
+            };
         });
 
         // Fetch the available jobs on the queue
@@ -163,7 +166,9 @@
 
             if (jobs.length > 0) {
                 $.each(jobs, function(i, job) {
-                    job.enlarge = toggleStates[job.id];
+                    var jobCache = jobsCache[job.id]||{};
+                    job.expand = jobCache.expand;
+                    job.logs = jobCache.logs;
                     job.duration = (Date.create(job.ended_at)-Date.create(job.started_at))/1000;
                     job.created_at = toRelative(Date.create(job.created_at));
                     if (job.ended_at) {
@@ -221,7 +226,7 @@
                 $ul.append(html);
             }
 
-            $("pre.exc_info").click(function(e){ $(this).closest("tr[data-role=job]").toggleClass("enlarge"); });
+            $(".expand").click(function(e){ $(this).closest("tr[data-role=job]").toggleClass("expand"); });
 
             window.asyncLoadLogs();
         });
@@ -246,7 +251,7 @@
             return false;
         });
 
-        $("#toggle-json-jobs").click(function(){ $("table#jobs").toggleClass("enlarge"); });
+        $("#toggle-json-jobs").click(function(){ $("table#jobs").toggleClass("expand"); });
 
         // Enable the AJAX behaviour of the buttons
         $('#empty-btn, #compact-btn, #requeue-all-btn, #cancel-all-btn').click(function(e) {

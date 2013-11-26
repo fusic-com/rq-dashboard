@@ -51,7 +51,7 @@
     </div>
 
     <script name="job-row" type="text/template">
-        <tr data-role="job" data-job-id="<%= id %>" class="<%= (enlarge) ? 'enlarge' : '' %>">
+        <tr data-role="job" data-job-id="<%= id %>" class="<%= (expand) ? 'expand' : '' %>">
             <td style='word-wrap:break-word'>
               <a href="{{ base_url }}job/<%= id %>"><%= $('<div/>').text(name).html() %></a>
               <div>
@@ -80,7 +80,7 @@
               <pre class="exc_info"><%= $('<div/>').text(args).html() %></pre>
               {% if show_logs %}
                 Logs
-                <pre class="exc_info job-logs loading"></pre>
+                <pre class="exc_info job-logs loading"><%= logs ? logs : "N/A" %></pre>
               {% endif %}
               {% if show_results %}
                 <% if (result) { %>
@@ -92,6 +92,7 @@
                 <span style='color:red'>Exception :</span>
                 <pre class="exc_info"><%= $('<div/>').text(exc_info).html() %></pre>
               <% } %>
+              <a href="#" class="expand">expand</ad>
             </td>
             <td>
               <div><span class="creation_date">Created <%= created_at %></span></div>

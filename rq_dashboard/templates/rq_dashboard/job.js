@@ -14,7 +14,7 @@
 
             if (job && jobs.length > 0) {
                 $.each(jobs, function(i, job) {
-                    job.enlarge=true;
+                    job.expand=true;
                     job.created_at = toRelative(Date.create(job.created_at));
 
                     if (job.ended_at) {

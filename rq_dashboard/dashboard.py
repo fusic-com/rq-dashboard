@@ -30,6 +30,11 @@ class RqTimeoutQueue(FailedQueue):
         Queue.__init__(self, 'timeout', connection=connection)
 
 
+class RqRetryQueue(FailedQueue):
+    def __init__(self, connection=None):
+        Queue.__init__(self, 'retry', connection=connection)
+
+
 @dashboard.before_request
 def authentication_hook():
     """ Allow the parent app to authenticate user's access to the dashboard
@@ -184,15 +189,20 @@ def cancel_job_view(job_id):
 def requeue_job_view(job_id):
 
     # Just try both failed queues... don't care about efficiency for single job retries
-    timeout_queue = RqTimeoutQueue()
-    failed_queue = get_failed_queue()
 
     try:
+        failed_queue = get_failed_queue()
         failed_queue.requeue(job_id)
     except:
         pass
     try:
+        timeout_queue = RqTimeoutQueue()
         timeout_queue.requeue(job_id)
+    except:
+        pass
+    try:
+        retry_queue = RqRetryQueue()
+        retry_queue.requeue(job_id)
     except:
         pass
 
@@ -221,6 +231,8 @@ def empty_queue(queue_name):
 def requeue_queue(queue_name):
     if queue_name == "timeout":
         fq = RqTimeoutQueue()
+    elif queue_name == "retry":
+        fq = RqRetryQueue()
     else:
         fq = FailedQueue()
     job_ids = fq.job_ids

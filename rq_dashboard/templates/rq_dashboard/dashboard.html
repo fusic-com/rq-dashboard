@@ -149,6 +149,10 @@
        id="requeue-all-btn" class="btn btn-small" style="float: right; margin-right: 8px;">
        <i class="icon-retweet"></i> Requeue all timeout jobs
     </a>
+    <a href="{{ url_for('rq_dashboard.requeue_queue', queue_name='retry') }}"
+       id="requeue-all-btn" class="btn btn-small" style="float: right; margin-right: 8px;">
+       <i class="icon-retweet"></i> Requeue all retry jobs
+    </a>
     <a id="toggle-json-jobs" class="btn btn-small" style="float: right; margin-right: 8px;">Expand all logs</a>
 {% endblock %}
 

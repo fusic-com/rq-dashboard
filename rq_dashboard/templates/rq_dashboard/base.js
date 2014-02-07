@@ -70,8 +70,8 @@ window.asyncLoadLogs = function(){
         "data": JSON.stringify({"jobsids": jobsIds}),
         "success":function(results) {
             if (!results.success) return console.log("error on fetching job logs : " + results.error);
-            $.each(results.logs, function(i, item){
-                $("[data-job-id='" + item.jobid + "'] .job-logs.loading").removeClass("loading").html(item.logs.join("\n"));
+            $.each(results.logs, function(jobid, lines){
+                $("[data-job-id='" + jobid + "'] .job-logs.loading").removeClass("loading").html(lines);
             });
             $(".job-logs.loading").removeClass("loading").html("&oslash;");
         }
@@ -115,16 +115,57 @@ $(document).ready(function(){
     });
 
 
-    $("#enable-polling").change(function(firstLoad){
-        if ($(this).is(":checked")) {
-            window.pollInterval = setInterval(window.refresh_all_tables, POLL_INTERVAL);
-            if (!firstLoad) window.refresh_all_tables();
-        } else if (window.pollInterval !== undefined) {
-            clearInterval(window.pollInterval);
-            delete(window.pollInterval);
-        }
-    });
-    $("#enable-polling").change(true);
+    window.isTabVisible = true;
+
+      // http://stackoverflow.com/questions/1060008/is-there-a-way-to-detect-if-a-browser-window-is-not-currently-active
+      (function() {
+
+        var onchange = function(evt) {
+
+            var prevVisible = window.isTabVisible;
+            var v = true, h = false,
+                evtMap = {
+                    focus:v, focusin:v, pageshow:v, blur:h, focusout:h, pagehide:h
+                };
+
+            evt = evt || window.event;
+            if (evt.type in evtMap)
+                window.isTabVisible = evtMap[evt.type];
+            else
+                window.isTabVisible = this[hidden] ? false : true;
+
+            // if (prevVisible != self.isTabVisible) {
+            //   self.trigger("visibilitychange");
+            // }
+        };
+
+        var hidden = "hidden";
+
+        // Standards:
+        if (hidden in document)
+            document.addEventListener("visibilitychange", onchange);
+        else if ((hidden = "mozHidden") in document)
+            document.addEventListener("mozvisibilitychange", onchange);
+        else if ((hidden = "webkitHidden") in document)
+            document.addEventListener("webkitvisibilitychange", onchange);
+        else if ((hidden = "msHidden") in document)
+            document.addEventListener("msvisibilitychange", onchange);
+        // IE 9 and lower:
+        else if ('onfocusin' in document)
+            document.onfocusin = document.onfocusout = onchange;
+        // All others:
+        else
+            window.onpageshow = window.onpagehide = window.onfocus = window.onblur = onchange;
+
+      })();
+
     // $('#refresh-button').click(window.refresh_all_tables);
     window.refresh_all_tables();
+
+    window.pollInterval = setInterval(function() {
+        if ($("#enable-polling").is(":checked") && window.isTabVisible) {
+            window.refresh_all_tables();
+        }
+    }, POLL_INTERVAL);
+
 });

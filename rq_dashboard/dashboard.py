@@ -271,7 +271,7 @@ def compact_queue(queue_name):
 @dashboard.route('/queues.json')
 @jsonify
 def list_queues():
-    queues = serialize_queues(sorted(Queue.all()))
+    queues = serialize_queues(sorted(Queue.all(), reverse=True))
     return dict(queues=queues)
 
 @dashboard.route('/jobs/<queue_name>/<page>.json')

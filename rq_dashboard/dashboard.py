@@ -134,7 +134,7 @@ def parse_job(job):
     data = json.loads(job.description)
     return {"name": data[0], "args": json.dumps(data[1])}
   except:
-    return {"name": "JSON parse error", "args": repr(job.description)}
+    return {"name": repr(job.description) , "args": repr(job.description)}
 
   # data = pickle.loads(job.data)
   # try:

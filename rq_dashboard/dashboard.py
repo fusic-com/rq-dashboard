@@ -280,6 +280,7 @@ def list_jobs(queue_name, page):
     current_page = int(page)
     queue = Queue(queue_name)
     per_page = current_app.config.get('RQ_DASHBOARD_JOBS_PER_PAGE', 5)
+    order = current_app.config.get('RQ_DASHBOARD_JOBS_ORDER_DESC', True)
     total_items = queue.count
     pages_numbers_in_window = pagination_window(total_items, current_page, per_page)
     pages_in_window = [dict(number=p, url=url_for('.overview',
@@ -298,9 +299,17 @@ def list_jobs(queue_name, page):
         dict(pages_in_window=pages_in_window,
             next_page=next_page,
             prev_page=prev_page))
-
-    offset = (current_page - 1) * per_page
-    jobs = [serialize_job(job) for job in queue.get_jobs(offset, per_page)]
+    if order :
+        tmp_offset = total_items - ((current_page - 1) * per_page)
+        if tmp_offset >= per_page :
+            offset =  tmp_offset - per_page
+        else :
+            offset = 0
+            per_page = tmp_offset
+        jobs = list(reversed([serialize_job(job) for job in queue.get_jobs(offset, per_page)]))
+    else :
+        offset = (current_page - 1) * per_page
+        jobs = [serialize_job(job) for job in queue.get_jobs(offset, per_page)]
     return dict(name=queue.name, jobs=jobs, pagination=pagination)
 
 

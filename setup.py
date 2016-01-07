@@ -11,7 +11,7 @@ def get_version():
     raise RuntimeError('No version info found.')
 
 setup(
-    name='rq-dashboard',
+    name='frq-dashboard',
     version=get_version(),
     url='https://github.com/nvie/rq-dashboard',
     license='BSD',

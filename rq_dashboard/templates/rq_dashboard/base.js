@@ -57,7 +57,7 @@ var api = {
     }
 };
 
-window.asyncLoadLogs = function(){
+/*window.asyncLoadLogs = function(){
     jobsIds = [];
     $(".job-logs.loading").each(function(){
         jobsIds.push($(this).closest("[data-role=job]").data("job-id"));
@@ -76,7 +76,7 @@ window.asyncLoadLogs = function(){
             $(".job-logs.loading").removeClass("loading").html("&oslash;");
         }
     });
-};
+};*/
 
 
 $(document).ready(function(){

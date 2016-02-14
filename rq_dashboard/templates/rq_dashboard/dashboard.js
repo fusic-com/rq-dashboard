@@ -228,7 +228,7 @@
 
             $(".expand").click(function(e){ $(this).closest("tr[data-role=job]").toggleClass("expand"); e.preventDefault(); });
 
-            window.asyncLoadLogs();
+            /*window.asyncLoadLogs();*/
         });
     };
 

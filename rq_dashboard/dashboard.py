@@ -202,7 +202,7 @@ def customrequeue(queue, job_id, name):
     q.enqueue_job(job)
 
     
-@dashboard.route('/job/<job_id>/debugrequeue', methods=['POST'])
+@dashboard.route('/job/<job_id>/debugrequeue', methods=['GET'])
 @jsonify
 def debugrequeue_job_view(job_id):
     # Requeue job to debug queue  

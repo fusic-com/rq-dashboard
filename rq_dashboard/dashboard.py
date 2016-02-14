@@ -8,7 +8,7 @@ from flask import current_app, url_for, abort
 from flask import render_template
 from rq import Queue, Worker
 from rq.queue import FailedQueue
-from rq.job import Job
+from rq.job import Job,JobStatus
 from rq.exceptions import InvalidJobOperationError
 from rq import cancel_job, requeue_job
 from rq import get_failed_queue

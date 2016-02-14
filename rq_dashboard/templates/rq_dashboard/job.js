@@ -40,7 +40,7 @@
             if (done !== undefined) {
                 done();
             }
-            window.asyncLoadLogs();
+            /*window.asyncLoadLogs();*/
         });
     };
 

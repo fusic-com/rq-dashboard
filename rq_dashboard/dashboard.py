@@ -183,6 +183,49 @@ def cancel_job_view(job_id):
     cancel_job(job_id)
     return dict(status='OK')
 
+def customrequeue(queue, job_id, name):
+    """Requeues the job with the given job ID."""
+    try:
+        job = queue.job_class.fetch(job_id, connection=queue.connection)
+    except NoSuchJobError:
+        # Silently ignore/remove this job and return (i.e. do nothing)
+        queue.remove(job_id)
+        return
+
+    # Delete it from the failed queue (raise an error if that failed)
+    if queue.remove(job) == 0:
+        raise InvalidJobOperationError('Cannot requeue non-failed jobs')
+
+    job.set_status(JobStatus.QUEUED)
+    job.exc_info = None
+    q = Queue(name, connection=queue.connection)
+    q.enqueue_job(job)
+
+    
+@dashboard.route('/job/<job_id>/debugrequeue', methods=['POST'])
+@jsonify
+def debugrequeue_job_view(job_id):
+    # Requeue job to debug queue  
+    # Just try both failed queues... don't care about efficiency for single job retries
+
+    try:
+        failed_queue = get_failed_queue()
+        customrequeue(failed_queue,job_id,'debug')
+    except:
+        pass
+    try:
+        timeout_queue = RqTimeoutQueue()
+        customrequeue(timeout_queue,job_id,'debug')
+    except:
+        pass
+    try:
+        retry_queue = RqRetryQueue()
+        customrequeue(retry_queue,job_id,'debug')
+    except:
+        pass
+
+    return dict(status='OK')
+    
 
 @dashboard.route('/job/<job_id>/requeue', methods=['POST'])
 @jsonify

@@ -198,6 +198,7 @@ def customrequeue(queue, job_id, name):
 
     job.set_status(JobStatus.QUEUED)
     job.exc_info = None
+    job.timeout = job.timeout * 10 
     q = Queue(name, connection=queue.connection)
     q.enqueue_job(job)
 
